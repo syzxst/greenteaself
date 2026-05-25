@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Write a Review - Green Tea</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .review-card {
+            background: #ffffff;
+            max-width: 500px;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            padding: 32px 24px;
+            text-align: center;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f0f0;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 统一正文类文字字号、取消加粗 */
+        h1 {
+            font-size: 18px;
+            font-weight: normal;
+            margin-bottom: 32px;
+            color: #111;
+        }
+
+        .product-image {
+            width: 280px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: normal;
+            color: #222;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .tip-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 30px;
+            padding: 10px;
+        }
+
+        .rating-section h3 {
+            font-size: 18px;
+            font-weight: normal;
+            margin-bottom: 16px;
+            color: #222;
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .star {
+            font-size: 36px;
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .star.selected,
+        .star:hover {
+            color: #f5a623;
+        }
+
+        .review-input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 18px;
+            margin-bottom: 24px;
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .next-btn {
+            width: 100%;
+            padding: 18px;
+            background: #ccc;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: not-allowed;
+            transition: background 0.3s;
+        }
+
+        .next-btn.active {
+            background: #111;
+            cursor: pointer;
+        }
+
+        .status-message {
+            margin-top: 16px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="review-card">
+        <button class="close-btn">&times;</button>
+        <h1>Write a review</h1>
+
+        <img src="greentea.jpg" alt="Green Tea" class="product-image">
+
+        <div class="product-name">
+            Premium Green Tea
+        </div>
+
+        <div class="tip-text">
+           Write reviews to receive additional discounts
+        </div>
+
+        <div class="rating-section">
+            <h3>Rate this product</h3>
+            <div class="stars">
+                <span class="star" data-value="1">☆</span>
+                <span class="star" data-value="2">☆</span>
+                <span class="star" data-value="3">☆</span>
+                <span class="star" data-value="4">☆</span>
+                <span class="star" data-value="5">☆</span>
+            </div>
+        </div>
+
+        <textarea class="review-input" placeholder="Share your experience here..."></textarea>
+
+        <button class="next-btn" id="submitBtn">Submit Review</button>
+        <div class="status-message" id="statusMsg"></div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwoZw3WyAUWT8tmmdb2kR7P5PlWyfa-7u5UZsQ5l8tmddQiMEtHyn4gQ4qUTE1l8B85xg/exec";
+
+        const stars = document.querySelectorAll('.star');
+        const reviewInput = document.querySelector('.review-input');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMsg = document.getElementById('statusMsg');
+        const closeBtn = document.querySelector('.close-btn');
+
+        let selectedRating = 0;
+
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                selectedRating = parseInt(star.dataset.value);
+                updateStars();
+                checkFormValidity();
+            });
+
+            star.addEventListener('mouseover', () => {
+                const hoverValue = parseInt(star.dataset.value);
+                stars.forEach(s => {
+                    if (parseInt(s.dataset.value) <= hoverValue) {
+                        s.style.color = '#f5a623';
+                    } else {
+                        s.style.color = '#ccc';
+                    }
+                });
+            });
+
+            star.addEventListener('mouseout', () => {
+                updateStars();
+            });
+        });
+
+        function updateStars() {
+            stars.forEach(s => {
+                if (parseInt(s.dataset.value) <= selectedRating) {
+                    s.classList.add('selected');
+                    s.style.color = '#f5a623';
+                } else {
+                    s.classList.remove('selected');
+                    s.style.color = '#ccc';
+                }
+            });
+        }
+
+        function checkFormValidity() {
+            if (selectedRating > 0 && reviewInput.value.trim() !== "") {
+                submitBtn.classList.add('active');
+            } else {
+                submitBtn.classList.remove('active');
+            }
+        }
+
+        reviewInput.addEventListener('input', checkFormValidity);
+
+        submitBtn.addEventListener('click', async () => {
+            if (!submitBtn.classList.contains('active')) return;
+            const reviewText = reviewInput.value.trim();
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Submitting...";
+            statusMsg.textContent = "";
+
+            try {
+                const formData = new FormData();
+                formData.append('rating', selectedRating);
+                formData.append('review', reviewText);
+                formData.append('product', 'Premium Green Tea');
+
+                await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body: formData
+                });
+
+                statusMsg.textContent = "Thank you! Your review has been submitted successfully.";
+                statusMsg.style.color = "green";
+                selectedRating = 0;
+                updateStars();
+                reviewInput.value = "";
+                submitBtn.classList.remove('active');
+            } catch (error) {
+                statusMsg.textContent = "Submission failed, please try again later.";
+                statusMsg.style.color = "red";
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Submit Review";
+            }
+        });
+
+        closeBtn.addEventListener('click', () => {
+            window.close();
+        });
+    </script>
+</body>
+</html>
